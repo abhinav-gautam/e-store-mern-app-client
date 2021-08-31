@@ -11,7 +11,14 @@ const ProductList = () => {
     const { productsList, productsCount, isProductLoading, isProductUpdating, isProductAdding, isProductDeleting } = useSelector(state => state.products)
     const dispatch = useDispatch()
 
-    const [product, setProduct] = useState({});
+    const initialProductState = {
+        _id: "",
+        productName: "",
+        price: "",
+        productImage: "",
+        productDescription: ""
+    }
+    const [product, setProduct] = useState(initialProductState);
     const [index, setIndex] = useState(-1);
 
     const [show, setShow] = useState(false);
@@ -82,7 +89,7 @@ const ProductList = () => {
                     </tbody>
                 </table>
             </div>
-            <EditProductModal product={product} setProduct={setProduct} index={index} show={show} setShow={setShow} />
+            <EditProductModal product={product} setProduct={setProduct} index={index} show={show} setShow={setShow} initialProductState={initialProductState} />
         </>
     );
 }

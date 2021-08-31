@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { editProduct } from '../redux/productsSlice';
 import LoadingSpinner from './LoadingSpinner';
 
-const EditProductModal = ({ product, setProduct, index, show, setShow }) => {
+const EditProductModal = ({ product, setProduct, index, show, setShow, initialProductState }) => {
     const { isProductLoading, } = useSelector(state => state.products)
 
     const dispatch = useDispatch()
@@ -34,11 +34,14 @@ const EditProductModal = ({ product, setProduct, index, show, setShow }) => {
         if (!product.productDescription) {
             errors.productDescription = "Product Description is required"
         }
-        if (!file) {
-            errors.productImage = "Product Image is required"
-        }
         return errors
     }
+
+    useEffect(() => {
+        if (file) {
+            setFile(null)
+        }
+    }, product._id)
 
     useEffect(() => {
         if (validate) {
@@ -63,7 +66,9 @@ const EditProductModal = ({ product, setProduct, index, show, setShow }) => {
             const formData = new FormData()
 
             // Appending image to it
-            formData.append("productImage", file, file.name)
+            if (file) {
+                formData.append("productImage", file, file.name)
+            }
 
             // Appending productObj
             formData.append("product", JSON.stringify(product))
@@ -116,14 +121,19 @@ const EditProductModal = ({ product, setProduct, index, show, setShow }) => {
 
                     </div>
                     {/* Product Image */}
-                    <div className="form-group mt-4">
-                        <label htmlFor="formFile" className="form-label">Product Image</label>
-                        <div className="d-flex align-items-center">
-                            <input
-                                className="form-control" name="productImage"
-                                type="file" id="formFile" accept="image/*"
-                                onChange={onFileSelect}
-                            />
+                    <div className="form-group mt-4 d-flex justify-content-start">
+                        <div>
+                            <label htmlFor="formFile" className="form-label">Product Image</label>
+                            <div className="d-flex align-items-center me-4">
+                                <input
+                                    className="form-control " name="productImage"
+                                    type="file" id="formFile" accept="image/*"
+                                    onChange={onFileSelect}
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <img src={product.productImage} alt="" width="100px" />
                         </div>
                         {error.productImage && <p className="alert alert-danger py-2 mt-2">{error.productImage}</p>}
                     </div>
@@ -142,7 +152,7 @@ const EditProductModal = ({ product, setProduct, index, show, setShow }) => {
                     {/* Buttons */}
                     <div className="mt-4">
                         <button type="submit" className=" btn btn-success mb-3 me-3">Update</button>
-                        <button className="btn btn-danger mb-3" type="reset">Reset</button>
+                        <button className="btn btn-danger mb-3" type="reset" onClick={() => { setProduct(initialProductState); setFile(null) }}>Reset</button>
                     </div>
                     {/* Loading spinner */}
                     {
